@@ -1,0 +1,157 @@
+name: TaskMonk CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-and-test-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+          
+      - name: Restore dependencies
+        run: dotnet restore src/TaskMonk/TaskMonk.csproj
+        
+      - name: Build
+        run: dotnet build src/TaskMonk/TaskMonk.csproj --no-restore
+        
+      - name: Test
+        run: dotnet test tests/TaskMonk.Tests/TaskMonk.Tests.csproj --verbosity normal
+        
+      - name: Upload backend artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend-artifacts
+          path: src/TaskMonk/bin/Debug/net8.0/
+
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci
+          
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm run build
+          
+      - name: Upload frontend artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: frontend-artifacts
+          path: frontend/build/
+
+  deploy-dev:
+    needs: [build-and-test-backend, build-frontend]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: development
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+          
+      - name: Setup AWS SAM CLI
+        uses: aws-actions/setup-sam@v2
+        
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          
+      - name: SAM build
+        run: sam build
+        
+      - name: SAM deploy
+        run: |
+          sam deploy --stack-name taskmonk-dev \
+            --parameter-overrides \
+              Environment=dev \
+              SenderEmail=${{ secrets.SENDER_EMAIL }} \
+            --no-confirm-changeset \
+            --no-fail-on-empty-changeset
+            
+      - name: Download frontend artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: frontend-artifacts
+          path: frontend-build
+          
+      - name: Deploy frontend to S3
+        run: |
+          aws s3 sync frontend-build/ s3://${{ secrets.FRONTEND_BUCKET }} --delete
+          
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
+
+  deploy-prod:
+    needs: deploy-dev
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+          
+      - name: Setup AWS SAM CLI
+        uses: aws-actions/setup-sam@v2
+        
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          
+      - name: SAM build
+        run: sam build
+        
+      - name: SAM deploy
+        run: |
+          sam deploy --stack-name taskmonk-prod \
+            --parameter-overrides \
+              Environment=prod \
+              SenderEmail=${{ secrets.SENDER_EMAIL }} \
+            --no-confirm-changeset \
+            --no-fail-on-empty-changeset
+            
+      - name: Download frontend artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: frontend-artifacts
+          path: frontend-build
+          
+      - name: Deploy frontend to S3
+        run: |
+          aws s3 sync frontend-build/ s3://${{ secrets.FRONTEND_BUCKET }} --delete
+          
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"

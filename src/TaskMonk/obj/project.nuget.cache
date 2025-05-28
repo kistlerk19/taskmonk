@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "dgSpecHash": "B7oN9iL8y38=",
+  "success": true,
+  "projectFilePath": "/Users/verlock/workflows/taskmonk/src/TaskMonk/TaskMonk.csproj",
+  "expectedPackageFiles": [
+    "/Users/verlock/.nuget/packages/amazon.lambda.apigatewayevents/2.7.0/amazon.lambda.apigatewayevents.2.7.0.nupkg.sha512",
+    "/Users/verlock/.nuget/packages/amazon.lambda.core/2.2.0/amazon.lambda.core.2.2.0.nupkg.sha512",
+    "/Users/verlock/.nuget/packages/amazon.lambda.dynamodbevents/2.3.0/amazon.lambda.dynamodbevents.2.3.0.nupkg.sha512",
+    "/Users/verlock/.nuget/packages/amazon.lambda.serialization.systemtextjson/2.4.0/amazon.lambda.serialization.systemtextjson.2.4.0.nupkg.sha512",
+    "/Users/verlock/.nuget/packages/amazon.lambda.sqsevents/2.2.0/amazon.lambda.sqsevents.2.2.0.nupkg.sha512",
+    "/Users/verlock/.nuget/packages/awssdk.cognitoidentityprovider/3.7.300/awssdk.cognitoidentityprovider.3.7.300.nupkg.sha512",
+    "/Users/verlock/.nuget/packages/awssdk.core/3.7.300/awssdk.core.3.7.300.nupkg.sha512",
+    "/Users/verlock/.nuget/packages/awssdk.dynamodbv2/3.7.300/awssdk.dynamodbv2.3.7.300.nupkg.sha512",
+    "/Users/verlock/.nuget/packages/awssdk.eventbridge/3.7.300/awssdk.eventbridge.3.7.300.nupkg.sha512",
+    "/Users/verlock/.nuget/packages/awssdk.simpleemail/3.7.300/awssdk.simpleemail.3.7.300.nupkg.sha512",
+    "/Users/verlock/.nuget/packages/microsoft.netcore.app.ref/8.0.16/microsoft.netcore.app.ref.8.0.16.nupkg.sha512",
+    "/Users/verlock/.nuget/packages/microsoft.aspnetcore.app.ref/8.0.16/microsoft.aspnetcore.app.ref.8.0.16.nupkg.sha512"
+  ],
+  "logs": []
+}

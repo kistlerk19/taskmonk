@@ -1,0 +1,222 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/verlock/workflows/taskmonk/tests/TaskMonk.Tests/TaskMonk.Tests.csproj": {}
+  },
+  "projects": {
+    "/Users/verlock/workflows/taskmonk/src/TaskMonk/TaskMonk.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/verlock/workflows/taskmonk/src/TaskMonk/TaskMonk.csproj",
+        "projectName": "TaskMonk",
+        "projectPath": "/Users/verlock/workflows/taskmonk/src/TaskMonk/TaskMonk.csproj",
+        "packagesPath": "/Users/verlock/.nuget/packages/",
+        "outputPath": "/Users/verlock/workflows/taskmonk/src/TaskMonk/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/verlock/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.300"
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "AWSSDK.CognitoIdentityProvider": {
+              "target": "Package",
+              "version": "[3.7.300, )"
+            },
+            "AWSSDK.DynamoDBv2": {
+              "target": "Package",
+              "version": "[3.7.300, )"
+            },
+            "AWSSDK.EventBridge": {
+              "target": "Package",
+              "version": "[3.7.300, )"
+            },
+            "AWSSDK.SimpleEmail": {
+              "target": "Package",
+              "version": "[3.7.300, )"
+            },
+            "Amazon.Lambda.APIGatewayEvents": {
+              "target": "Package",
+              "version": "[2.7.0, )"
+            },
+            "Amazon.Lambda.Core": {
+              "target": "Package",
+              "version": "[2.2.0, )"
+            },
+            "Amazon.Lambda.DynamoDBEvents": {
+              "target": "Package",
+              "version": "[2.3.0, )"
+            },
+            "Amazon.Lambda.SQSEvents": {
+              "target": "Package",
+              "version": "[2.2.0, )"
+            },
+            "Amazon.Lambda.Serialization.SystemTextJson": {
+              "target": "Package",
+              "version": "[2.4.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.16, 8.0.16]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.16, 8.0.16]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.300/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/verlock/workflows/taskmonk/tests/TaskMonk.Tests/TaskMonk.Tests.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/verlock/workflows/taskmonk/tests/TaskMonk.Tests/TaskMonk.Tests.csproj",
+        "projectName": "TaskMonk.Tests",
+        "projectPath": "/Users/verlock/workflows/taskmonk/tests/TaskMonk.Tests/TaskMonk.Tests.csproj",
+        "packagesPath": "/Users/verlock/.nuget/packages/",
+        "outputPath": "/Users/verlock/workflows/taskmonk/tests/TaskMonk.Tests/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/verlock/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "/Users/verlock/workflows/taskmonk/src/TaskMonk/TaskMonk.csproj": {
+                "projectPath": "/Users/verlock/workflows/taskmonk/src/TaskMonk/TaskMonk.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.300"
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "AWSSDK.DynamoDBv2": {
+              "target": "Package",
+              "version": "[3.7.300, )"
+            },
+            "AWSSDK.SimpleEmail": {
+              "target": "Package",
+              "version": "[3.7.300, )"
+            },
+            "Amazon.Lambda.APIGatewayEvents": {
+              "target": "Package",
+              "version": "[2.7.0, )"
+            },
+            "Amazon.Lambda.TestUtilities": {
+              "target": "Package",
+              "version": "[2.0.0, )"
+            },
+            "Microsoft.NET.Test.Sdk": {
+              "target": "Package",
+              "version": "[17.8.0, )"
+            },
+            "Moq": {
+              "target": "Package",
+              "version": "[4.20.69, )"
+            },
+            "xunit": {
+              "target": "Package",
+              "version": "[2.6.1, )"
+            },
+            "xunit.runner.visualstudio": {
+              "target": "Package",
+              "version": "[2.5.3, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.16, 8.0.16]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.16, 8.0.16]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.300/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
