@@ -1,1 +1,569 @@
-undefined
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: TaskMonk - AWS Serverless Task Management System
+
+Globals:
+  Function:
+    Runtime: dotnet8
+    MemorySize: 256
+    Timeout: 30
+    Architectures:
+      - x86_64
+    Environment:
+      Variables:
+        SENDER_EMAIL: !Ref SenderEmail
+        ENVIRONMENT: !Ref Environment
+
+Parameters:
+  SenderEmail:
+    Type: String
+    Description: Email address to use as sender for notifications
+    Default: noreply@taskmonk.com
+  
+  Environment:
+    Type: String
+    Description: Deployment environment
+    Default: dev
+    AllowedValues:
+      - dev
+      - test
+      - prod
+
+Resources:
+  # DynamoDB Tables
+  UsersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub TaskMonk-Users-${Environment}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: email
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: Email-index
+          KeySchema:
+            - AttributeName: email
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+
+  TeamsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub TaskMonk-Teams-${Environment}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: teamId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: teamId
+          KeyType: HASH
+
+  TasksTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub TaskMonk-Tasks-${Environment}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: taskId
+          AttributeType: S
+        - AttributeName: teamId
+          AttributeType: S
+        - AttributeName: assignedTo
+          AttributeType: S
+        - AttributeName: createdAt
+          AttributeType: S
+      KeySchema:
+        - AttributeName: taskId
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: TeamId-CreatedAt-index
+          KeySchema:
+            - AttributeName: teamId
+              KeyType: HASH
+            - AttributeName: createdAt
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+        - IndexName: AssignedTo-CreatedAt-index
+          KeySchema:
+            - AttributeName: assignedTo
+              KeyType: HASH
+            - AttributeName: createdAt
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+
+  CommentsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub TaskMonk-Comments-${Environment}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: commentId
+          AttributeType: S
+        - AttributeName: taskId
+          AttributeType: S
+        - AttributeName: createdAt
+          AttributeType: S
+      KeySchema:
+        - AttributeName: commentId
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: TaskId-CreatedAt-index
+          KeySchema:
+            - AttributeName: taskId
+              KeyType: HASH
+            - AttributeName: createdAt
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+
+  # Cognito User Pool
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub TaskMonkUserPool-${Environment}
+      AutoVerifiedAttributes:
+        - email
+      UsernameAttributes:
+        - email
+      Schema:
+        - Name: email
+          AttributeDataType: String
+          Mutable: true
+          Required: true
+        - Name: given_name
+          AttributeDataType: String
+          Mutable: true
+          Required: true
+        - Name: family_name
+          AttributeDataType: String
+          Mutable: true
+          Required: true
+
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: !Sub TaskMonkClient-${Environment}
+      UserPoolId: !Ref UserPool
+      GenerateSecret: false
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+        - ALLOW_USER_SRP_AUTH
+
+  # API Gateway
+  ApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref Environment
+      Auth:
+        DefaultAuthorizer: CognitoAuthorizer
+        Authorizers:
+          CognitoAuthorizer:
+            UserPoolArn: !GetAtt UserPool.Arn
+
+  # Lambda Functions
+  CreateUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src/TaskMonk/
+      Handler: TaskMonk::TaskMonk.Functions.CreateUser::FunctionHandler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersTable
+      Environment:
+        Variables:
+          USERS_TABLE: !Ref UsersTable
+          TEAMS_TABLE: !Ref TeamsTable
+          TASKS_TABLE: !Ref TasksTable
+          COMMENTS_TABLE: !Ref CommentsTable
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /users
+            Method: post
+            Auth:
+              Authorizer: NONE
+
+  CreateTeamFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src/TaskMonk/
+      Handler: TaskMonk::TaskMonk.Functions.CreateTeam::FunctionHandler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TeamsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersTable
+      Environment:
+        Variables:
+          USERS_TABLE: !Ref UsersTable
+          TEAMS_TABLE: !Ref TeamsTable
+          TASKS_TABLE: !Ref TasksTable
+          COMMENTS_TABLE: !Ref CommentsTable
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /teams
+            Method: post
+
+  InviteToTeamFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src/TaskMonk/
+      Handler: TaskMonk::TaskMonk.Functions.InviteToTeam::FunctionHandler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TeamsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersTable
+        - SESCrudPolicy:
+            IdentityName: "*"
+      Environment:
+        Variables:
+          USERS_TABLE: !Ref UsersTable
+          TEAMS_TABLE: !Ref TeamsTable
+          TASKS_TABLE: !Ref TasksTable
+          COMMENTS_TABLE: !Ref CommentsTable
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /teams/invite
+            Method: post
+
+  CreateTaskFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src/TaskMonk/
+      Handler: TaskMonk::TaskMonk.Functions.CreateTask::FunctionHandler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TasksTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TeamsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersTable
+        - SESCrudPolicy:
+            IdentityName: "*"
+        - EventBridgePutEventsPolicy:
+            EventBusName: default
+      Environment:
+        Variables:
+          USERS_TABLE: !Ref UsersTable
+          TEAMS_TABLE: !Ref TeamsTable
+          TASKS_TABLE: !Ref TasksTable
+          COMMENTS_TABLE: !Ref CommentsTable
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /tasks
+            Method: post
+
+  UpdateTaskStatusFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src/TaskMonk/
+      Handler: TaskMonk::TaskMonk.Functions.UpdateTaskStatus::FunctionHandler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TasksTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TeamsTable
+        - EventBridgePutEventsPolicy:
+            EventBusName: default
+      Environment:
+        Variables:
+          USERS_TABLE: !Ref UsersTable
+          TEAMS_TABLE: !Ref TeamsTable
+          TASKS_TABLE: !Ref TasksTable
+          COMMENTS_TABLE: !Ref CommentsTable
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /tasks/status
+            Method: put
+
+  GetUserTasksFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src/TaskMonk/
+      Handler: TaskMonk::TaskMonk.Functions.GetUserTasks::FunctionHandler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TasksTable
+      Environment:
+        Variables:
+          USERS_TABLE: !Ref UsersTable
+          TEAMS_TABLE: !Ref TeamsTable
+          TASKS_TABLE: !Ref TasksTable
+          COMMENTS_TABLE: !Ref CommentsTable
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /tasks/my
+            Method: get
+
+  GetTeamTasksFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src/TaskMonk/
+      Handler: TaskMonk::TaskMonk.Functions.GetTeamTasks::FunctionHandler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TasksTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TeamsTable
+      Environment:
+        Variables:
+          USERS_TABLE: !Ref UsersTable
+          TEAMS_TABLE: !Ref TeamsTable
+          TASKS_TABLE: !Ref TasksTable
+          COMMENTS_TABLE: !Ref CommentsTable
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /teams/{teamId}/tasks
+            Method: get
+
+  GetCommentsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src/TaskMonk/
+      Handler: TaskMonk::TaskMonk.Functions.GetComments::FunctionHandler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref CommentsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TasksTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TeamsTable
+      Environment:
+        Variables:
+          USERS_TABLE: !Ref UsersTable
+          TEAMS_TABLE: !Ref TeamsTable
+          TASKS_TABLE: !Ref TasksTable
+          COMMENTS_TABLE: !Ref CommentsTable
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /tasks/{taskId}/comments
+            Method: get
+
+  FilterTasksFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src/TaskMonk/
+      Handler: TaskMonk::TaskMonk.Functions.FilterTasks::FunctionHandler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TasksTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TeamsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersTable
+      Environment:
+        Variables:
+          USERS_TABLE: !Ref UsersTable
+          TEAMS_TABLE: !Ref TeamsTable
+          TASKS_TABLE: !Ref TasksTable
+          COMMENTS_TABLE: !Ref CommentsTable
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /tasks/filter
+            Method: post
+
+  GenerateTaskReportFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src/TaskMonk/
+      Handler: TaskMonk::TaskMonk.Functions.GenerateTaskReport::FunctionHandler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TasksTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TeamsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersTable
+      Environment:
+        Variables:
+          USERS_TABLE: !Ref UsersTable
+          TEAMS_TABLE: !Ref TeamsTable
+          TASKS_TABLE: !Ref TasksTable
+          COMMENTS_TABLE: !Ref CommentsTable
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /reports/tasks
+            Method: post
+
+  EmailNotificationHandlerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src/TaskMonk/
+      Handler: TaskMonk::TaskMonk.Functions.EmailNotificationHandler::FunctionHandler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersTable
+        - SESCrudPolicy:
+            IdentityName: "*"
+      Environment:
+        Variables:
+          USERS_TABLE: !Ref UsersTable
+          TEAMS_TABLE: !Ref TeamsTable
+          TASKS_TABLE: !Ref TasksTable
+          COMMENTS_TABLE: !Ref CommentsTable
+      Events:
+        TaskStatusChangedEvent:
+          Type: EventBridgeRule
+          Properties:
+            Pattern:
+              source:
+                - taskmonk.tasks
+              detail-type:
+                - taskmonk.task.statuschanged
+        TaskDeadlineApproachingEvent:
+          Type: EventBridgeRule
+          Properties:
+            Pattern:
+              source:
+                - taskmonk.tasks
+              detail-type:
+                - taskmonk.task.deadlineapproaching
+
+  DeadlineCheckerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src/TaskMonk/
+      Handler: TaskMonk::TaskMonk.Functions.DeadlineChecker::FunctionHandler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TasksTable
+        - EventBridgePutEventsPolicy:
+            EventBusName: default
+      Environment:
+        Variables:
+          USERS_TABLE: !Ref UsersTable
+          TEAMS_TABLE: !Ref TeamsTable
+          TASKS_TABLE: !Ref TasksTable
+          COMMENTS_TABLE: !Ref CommentsTable
+      Events:
+        ScheduledEvent:
+          Type: Schedule
+          Properties:
+            Schedule: rate(1 hour)
+            Name: !Sub DeadlineCheckerSchedule-${Environment}
+            Description: Checks for tasks with approaching deadlines
+
+  # S3 Bucket for Frontend
+  FrontendBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub taskmonk-frontend-${Environment}-${AWS::AccountId}
+      AccessControl: Private
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: index.html
+
+  # CloudFront Distribution
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Origins:
+          - DomainName: !GetAtt FrontendBucket.RegionalDomainName
+            Id: S3Origin
+            S3OriginConfig:
+              OriginAccessIdentity: !Sub origin-access-identity/cloudfront/${CloudFrontOAI}
+        Enabled: true
+        DefaultRootObject: index.html
+        DefaultCacheBehavior:
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+          TargetOriginId: S3Origin
+          ForwardedValues:
+            QueryString: false
+            Cookies:
+              Forward: none
+          ViewerProtocolPolicy: redirect-to-https
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: true
+        CustomErrorResponses:
+          - ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+          - ErrorCode: 404
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+
+  CloudFrontOAI:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: !Sub OAI for TaskMonk ${Environment} frontend
+
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref FrontendBucket
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              CanonicalUser: !GetAtt CloudFrontOAI.S3CanonicalUserId
+            Action: s3:GetObject
+            Resource: !Sub ${FrontendBucket.Arn}/*
+
+Outputs:
+  ApiEndpoint:
+    Description: API Gateway endpoint URL
+    Value: !Sub https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/
+  
+  UserPoolId:
+    Description: Cognito User Pool ID
+    Value: !Ref UserPool
+  
+  UserPoolClientId:
+    Description: Cognito User Pool Client ID
+    Value: !Ref UserPoolClient
+    
+  FrontendBucketName:
+    Description: S3 bucket for frontend hosting
+    Value: !Ref FrontendBucket
+    
+  CloudFrontDistributionId:
+    Description: CloudFront distribution ID
+    Value: !Ref CloudFrontDistribution
+    
+  CloudFrontDomainName:
+    Description: CloudFront domain name
+    Value: !GetAtt CloudFrontDistribution.DomainName
