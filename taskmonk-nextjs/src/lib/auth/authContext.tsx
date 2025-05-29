@@ -60,8 +60,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         password,
         attributes: { 
           email,
-          'name.givenName': firstName || email.split('@')[0], // Default to username part of email if not provided
-          'name.familyName': lastName || '' // Default to empty string if not provided
+          given_name: firstName || email.split('@')[0], // Default to username part of email if not provided
+          family_name: lastName || '' // Default to empty string if not provided
         },
       });
     } catch (error) {
