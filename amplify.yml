@@ -1,6 +1,6 @@
 version: 1
 applications:
-  - appRoot: .
+  - appRoot: taskmonk-nextjs
     frontend:
       phases:
         preBuild:
@@ -10,6 +10,9 @@ applications:
           commands:
             - npm run build
       artifacts:
-        baseDirectory: dist # or build, depending on your setup
+        baseDirectory: .next
         files:
           - '**/*'
+      cache:
+        paths:
+          - node_modules/**/*
