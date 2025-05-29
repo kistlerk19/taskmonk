@@ -46,6 +46,7 @@ export default function TeamForm({ teamId }: TeamFormProps) {
         router.push('/teams');
       },
       onError: (err: any) => {
+        console.error('Team creation error:', err);
         setError(err.message || 'Failed to create team');
       }
     }
@@ -79,10 +80,12 @@ export default function TeamForm({ teamId }: TeamFormProps) {
       if (isEditing) {
         await updateTeam.mutateAsync(formData);
       } else {
+        console.log('Submitting team data:', formData);
         await createTeam.mutateAsync(formData);
       }
-    } catch (err) {
-      // Error is handled in mutation callbacks
+    } catch (err: any) {
+      console.error('Form submission error:', err);
+      setError(err?.message || 'An error occurred while saving the team');
     }
   };
   

@@ -55,15 +55,38 @@ const teams = [
 
 async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
   try {
+    // Add CORS headers
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+    res.setHeader(
+      'Access-Control-Allow-Headers',
+      'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization'
+    );
+
+    // Handle OPTIONS request for CORS preflight
+    if (req.method === 'OPTIONS') {
+      res.status(200).end();
+      return;
+    }
+    
     switch (req.method) {
       case 'GET':
         res.status(200).json(teams);
         return;
         
       case 'POST':
+        console.log('Creating new team with data:', req.body);
+        
+        if (!req.body || !req.body.name) {
+          res.status(400).json({ message: 'Team name is required' });
+          return;
+        }
+        
         const newTeam = {
           id: (teams.length + 1).toString(),
           ...req.body,
+          members: req.body.members || [],
           createdAt: new Date().toISOString()
         };
         
@@ -72,11 +95,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void>
         return;
         
       default:
-        res.setHeader('Allow', ['GET', 'POST']);
+        res.setHeader('Allow', ['GET', 'POST', 'OPTIONS']);
         res.status(405).end(`Method ${req.method} Not Allowed`);
         return;
     }
   } catch (error: any) {
+    console.error('API error in teams handler:', error);
     res.status(500).json({ message: error.message || 'Internal Server Error' });
     return;
   }

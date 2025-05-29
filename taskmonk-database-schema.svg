@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="userTableGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#4FC3F7;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#4FC3F7;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="teamTableGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#81C784;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#81C784;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="taskTableGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#FFB74D;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#FFB74D;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="commentTableGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#9575CD;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#9575CD;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Arrow Marker -->
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="800" height="600" fill="#f8f9fa" />
+  
+  <!-- Title -->
+  <text x="400" y="40" font-family="Arial" font-size="24" text-anchor="middle" font-weight="bold">TaskMonk Database Schema</text>
+  
+  <!-- USER Table -->
+  <rect x="100" y="100" width="250" height="180" rx="10" ry="10" fill="url(#userTableGradient)" stroke="#333" stroke-width="2" />
+  <rect x="100" y="100" width="250" height="40" rx="10" ry="10" fill="#0288D1" stroke="#333" stroke-width="2" />
+  <text x="225" y="125" font-family="Arial" font-size="18" text-anchor="middle" fill="white" font-weight="bold">USER</text>
+  
+  <!-- USER Attributes -->
+  <text x="120" y="160" font-family="Arial" font-size="14" text-anchor="start">userId (PK)</text>
+  <text x="120" y="185" font-family="Arial" font-size="14" text-anchor="start">email</text>
+  <text x="120" y="210" font-family="Arial" font-size="14" text-anchor="start">firstName</text>
+  <text x="120" y="235" font-family="Arial" font-size="14" text-anchor="start">lastName</text>
+  <text x="120" y="260" font-family="Arial" font-size="14" text-anchor="start">teams (list)</text>
+  
+  <!-- TEAM Table -->
+  <rect x="450" y="100" width="250" height="180" rx="10" ry="10" fill="url(#teamTableGradient)" stroke="#333" stroke-width="2" />
+  <rect x="450" y="100" width="250" height="40" rx="10" ry="10" fill="#2E7D32" stroke="#333" stroke-width="2" />
+  <text x="575" y="125" font-family="Arial" font-size="18" text-anchor="middle" fill="white" font-weight="bold">TEAM</text>
+  
+  <!-- TEAM Attributes -->
+  <text x="470" y="160" font-family="Arial" font-size="14" text-anchor="start">teamId (PK)</text>
+  <text x="470" y="185" font-family="Arial" font-size="14" text-anchor="start">name</text>
+  <text x="470" y="210" font-family="Arial" font-size="14" text-anchor="start">description</text>
+  <text x="470" y="235" font-family="Arial" font-size="14" text-anchor="start">ownerId (FK)</text>
+  <text x="470" y="260" font-family="Arial" font-size="14" text-anchor="start">members (list)</text>
+  
+  <!-- TASK Table -->
+  <rect x="100" y="350" width="250" height="220" rx="10" ry="10" fill="url(#taskTableGradient)" stroke="#333" stroke-width="2" />
+  <rect x="100" y="350" width="250" height="40" rx="10" ry="10" fill="#EF6C00" stroke="#333" stroke-width="2" />
+  <text x="225" y="375" font-family="Arial" font-size="18" text-anchor="middle" fill="white" font-weight="bold">TASK</text>
+  
+  <!-- TASK Attributes -->
+  <text x="120" y="410" font-family="Arial" font-size="14" text-anchor="start">taskId (PK)</text>
+  <text x="120" y="435" font-family="Arial" font-size="14" text-anchor="start">title</text>
+  <text x="120" y="460" font-family="Arial" font-size="14" text-anchor="start">description</text>
+  <text x="120" y="485" font-family="Arial" font-size="14" text-anchor="start">status (enum)</text>
+  <text x="120" y="510" font-family="Arial" font-size="14" text-anchor="start">priority (enum)</text>
+  <text x="120" y="535" font-family="Arial" font-size="14" text-anchor="start">assignedTo (FK)</text>
+  <text x="120" y="560" font-family="Arial" font-size="14" text-anchor="start">teamId (FK)</text>
+  
+  <!-- COMMENT Table -->
+  <rect x="450" y="350" width="250" height="180" rx="10" ry="10" fill="url(#commentTableGradient)" stroke="#333" stroke-width="2" />
+  <rect x="450" y="350" width="250" height="40" rx="10" ry="10" fill="#5E35B1" stroke="#333" stroke-width="2" />
+  <text x="575" y="375" font-family="Arial" font-size="18" text-anchor="middle" fill="white" font-weight="bold">COMMENT</text>
+  
+  <!-- COMMENT Attributes -->
+  <text x="470" y="410" font-family="Arial" font-size="14" text-anchor="start">commentId (PK)</text>
+  <text x="470" y="435" font-family="Arial" font-size="14" text-anchor="start">taskId (FK)</text>
+  <text x="470" y="460" font-family="Arial" font-size="14" text-anchor="start">userId (FK)</text>
+  <text x="470" y="485" font-family="Arial" font-size="14" text-anchor="start">content</text>
+  <text x="470" y="510" font-family="Arial" font-size="14" text-anchor="start">createdAt</text>
+  
+  <!-- Relationships -->
+  <!-- USER owns TEAM -->
+  <line x1="350" y1="150" x2="450" y2="150" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+  <text x="400" y="140" font-family="Arial" font-size="12" text-anchor="middle">owns</text>
+  
+  <!-- USER belongs to TEAM -->
+  <line x1="450" y1="170" x2="350" y2="170" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+  <text x="400" y="190" font-family="Arial" font-size="12" text-anchor="middle">belongs to</text>
+  
+  <!-- USER creates TASK -->
+  <line x1="225" y1="280" x2="225" y2="350" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+  <text x="245" y="315" font-family="Arial" font-size="12" text-anchor="middle">creates</text>
+  
+  <!-- USER assigned to TASK -->
+  <line x1="175" y1="280" x2="175" y2="350" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+  <text x="155" y="315" font-family="Arial" font-size="12" text-anchor="middle">assigned to</text>
+  
+  <!-- TEAM contains TASK -->
+  <line x1="450" y1="200" x2="350" y2="400" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+  <text x="380" y="280" font-family="Arial" font-size="12" text-anchor="middle">contains</text>
+  
+  <!-- USER creates COMMENT -->
+  <line x1="275" y1="280" x2="450" y2="400" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+  <text x="350" y="330" font-family="Arial" font-size="12" text-anchor="middle">creates</text>
+  
+  <!-- TASK has COMMENT -->
+  <line x1="350" y1="450" x2="450" y2="450" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+  <text x="400" y="440" font-family="Arial" font-size="12" text-anchor="middle">has</text>
+  
+  <!-- Legend -->
+  <rect x="100" y="580" width="600" height="30" rx="5" ry="5" fill="#f5f5f5" stroke="#ddd" stroke-width="1" />
+  <text x="120" y="600" font-family="Arial" font-size="14" text-anchor="start">PK: Primary Key</text>
+  <text x="250" y="600" font-family="Arial" font-size="14" text-anchor="start">FK: Foreign Key</text>
+  <text x="380" y="600" font-family="Arial" font-size="14" text-anchor="start">1:N Relationship</text>
+  <line x1="500" y1="600" x2="530" y2="600" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+  <text x="580" y="600" font-family="Arial" font-size="14" text-anchor="start">N:M Relationship</text>
+  <line x1="700" y1="595" x2="730" y2="595" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+  <line x1="730" y1="605" x2="700" y2="605" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+</svg>

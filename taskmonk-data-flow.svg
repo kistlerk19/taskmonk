@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="userGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#4FC3F7;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#4FC3F7;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="frontendGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#81C784;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#81C784;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="apiGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#FFB74D;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#FFB74D;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="lambdaGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#FF8A65;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#FF8A65;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="dbGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#9575CD;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#9575CD;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="eventGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#F06292;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#F06292;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="emailGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#4DB6AC;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#4DB6AC;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Arrow Marker -->
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="800" height="500" fill="#f8f9fa" />
+  
+  <!-- Title -->
+  <text x="400" y="40" font-family="Arial" font-size="24" text-anchor="middle" font-weight="bold">TaskMonk Data Flow</text>
+  
+  <!-- User -->
+  <circle cx="100" cy="120" r="40" fill="url(#userGradient)" stroke="#333" stroke-width="2" />
+  <text x="100" y="125" font-family="Arial" font-size="14" text-anchor="middle">User</text>
+  
+  <!-- Frontend -->
+  <rect x="200" y="90" width="120" height="60" rx="10" ry="10" fill="url(#frontendGradient)" stroke="#333" stroke-width="2" />
+  <text x="260" y="125" font-family="Arial" font-size="14" text-anchor="middle">Next.js Frontend</text>
+  
+  <!-- Cognito -->
+  <rect x="200" y="200" width="120" height="60" rx="10" ry="10" fill="url(#apiGradient)" stroke="#333" stroke-width="2" />
+  <text x="260" y="235" font-family="Arial" font-size="14" text-anchor="middle">Cognito</text>
+  
+  <!-- API Gateway -->
+  <rect x="380" y="90" width="120" height="60" rx="10" ry="10" fill="url(#apiGradient)" stroke="#333" stroke-width="2" />
+  <text x="440" y="125" font-family="Arial" font-size="14" text-anchor="middle">API Gateway</text>
+  
+  <!-- Lambda Functions -->
+  <rect x="380" y="200" width="120" height="60" rx="10" ry="10" fill="url(#lambdaGradient)" stroke="#333" stroke-width="2" />
+  <text x="440" y="235" font-family="Arial" font-size="14" text-anchor="middle">Lambda Functions</text>
+  
+  <!-- DynamoDB -->
+  <rect x="380" y="310" width="120" height="60" rx="10" ry="10" fill="url(#dbGradient)" stroke="#333" stroke-width="2" />
+  <text x="440" y="345" font-family="Arial" font-size="14" text-anchor="middle">DynamoDB</text>
+  
+  <!-- EventBridge -->
+  <rect x="560" y="200" width="120" height="60" rx="10" ry="10" fill="url(#eventGradient)" stroke="#333" stroke-width="2" />
+  <text x="620" y="235" font-family="Arial" font-size="14" text-anchor="middle">EventBridge</text>
+  
+  <!-- SES -->
+  <rect x="560" y="310" width="120" height="60" rx="10" ry="10" fill="url(#emailGradient)" stroke="#333" stroke-width="2" />
+  <text x="620" y="345" font-family="Arial" font-size="14" text-anchor="middle">Amazon SES</text>
+  
+  <!-- User Email -->
+  <rect x="560" y="90" width="120" height="60" rx="10" ry="10" fill="url(#userGradient)" stroke="#333" stroke-width="2" />
+  <text x="620" y="125" font-family="Arial" font-size="14" text-anchor="middle">User Email</text>
+  
+  <!-- CloudWatch -->
+  <rect x="200" y="310" width="120" height="60" rx="10" ry="10" fill="url(#eventGradient)" stroke="#333" stroke-width="2" />
+  <text x="260" y="345" font-family="Arial" font-size="14" text-anchor="middle">CloudWatch</text>
+  
+  <!-- Flow Arrows -->
+  <!-- User to Frontend -->
+  <line x1="140" y1="120" x2="200" y2="120" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+  <text x="170" y="110" font-family="Arial" font-size="12" text-anchor="middle">Access</text>
+  
+  <!-- Frontend to Cognito -->
+  <line x1="260" y1="150" x2="260" y2="200" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+  <text x="290" y="175" font-family="Arial" font-size="12" text-anchor="middle">Authenticate</text>
+  
+  <!-- Cognito to Frontend -->
+  <line x1="240" y1="200" x2="240" y2="150" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+  <text x="210" y="175" font-family="Arial" font-size="12" text-anchor="middle">JWT Token</text>
+  
+  <!-- Frontend to API Gateway -->
+  <line x1="320" y1="120" x2="380" y2="120" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+  <text x="350" y="110" font-family="Arial" font-size="12" text-anchor="middle">API Request</text>
+  
+  <!-- API Gateway to Cognito -->
+  <line x1="380" y1="130" x2="320" y2="200" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+  <text x="330" y="160" font-family="Arial" font-size="12" text-anchor="middle">Validate Token</text>
+  
+  <!-- API Gateway to Lambda -->
+  <line x1="440" y1="150" x2="440" y2="200" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+  <text x="470" y="175" font-family="Arial" font-size="12" text-anchor="middle">Route Request</text>
+  
+  <!-- Lambda to DynamoDB -->
+  <line x1="440" y1="260" x2="440" y2="310" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+  <text x="470" y="285" font-family="Arial" font-size="12" text-anchor="middle">CRUD Operations</text>
+  
+  <!-- Lambda to EventBridge -->
+  <line x1="500" y1="230" x2="560" y2="230" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+  <text x="530" y="220" font-family="Arial" font-size="12" text-anchor="middle">Publish Events</text>
+  
+  <!-- EventBridge to SES -->
+  <line x1="620" y1="260" x2="620" y2="310" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+  <text x="650" y="285" font-family="Arial" font-size="12" text-anchor="middle">Notification Events</text>
+  
+  <!-- SES to User Email -->
+  <line x1="620" y1="310" x2="620" y2="150" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+  <text x="650" y="230" font-family="Arial" font-size="12" text-anchor="middle">Send Email</text>
+  
+  <!-- CloudWatch to Lambda -->
+  <line x1="260" y1="310" x2="380" y2="260" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+  <text x="300" y="280" font-family="Arial" font-size="12" text-anchor="middle">Scheduled Triggers</text>
+  
+  <!-- API Gateway to Frontend -->
+  <line x1="380" y1="110" x2="320" y2="110" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+  <text x="350" y="100" font-family="Arial" font-size="12" text-anchor="middle">Response</text>
+  
+  <!-- Legend -->
+  <rect x="50" y="400" width="700" height="60" rx="5" ry="5" fill="#f5f5f5" stroke="#ddd" stroke-width="1" />
+  <text x="400" y="420" font-family="Arial" font-size="16" text-anchor="middle" font-weight="bold">Legend</text>
+  
+  <circle cx="100" cy="440" r="10" fill="url(#userGradient)" stroke="#333" stroke-width="1" />
+  <text x="120" y="445" font-family="Arial" font-size="12" text-anchor="start">User</text>
+  
+  <rect x="170" y="430" width="20" height="20" rx="3" ry="3" fill="url(#frontendGradient)" stroke="#333" stroke-width="1" />
+  <text x="200" y="445" font-family="Arial" font-size="12" text-anchor="start">Frontend</text>
+  
+  <rect x="270" y="430" width="20" height="20" rx="3" ry="3" fill="url(#apiGradient)" stroke="#333" stroke-width="1" />
+  <text x="300" y="445" font-family="Arial" font-size="12" text-anchor="start">API Services</text>
+  
+  <rect x="380" y="430" width="20" height="20" rx="3" ry="3" fill="url(#lambdaGradient)" stroke="#333" stroke-width="1" />
+  <text x="410" y="445" font-family="Arial" font-size="12" text-anchor="start">Compute</text>
+  
+  <rect x="480" y="430" width="20" height="20" rx="3" ry="3" fill="url(#dbGradient)" stroke="#333" stroke-width="1" />
+  <text x="510" y="445" font-family="Arial" font-size="12" text-anchor="start">Data Storage</text>
+  
+  <rect x="590" y="430" width="20" height="20" rx="3" ry="3" fill="url(#eventGradient)" stroke="#333" stroke-width="1" />
+  <text x="620" y="445" font-family="Arial" font-size="12" text-anchor="start">Event Processing</text>
+</svg>

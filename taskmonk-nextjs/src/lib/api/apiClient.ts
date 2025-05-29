@@ -2,7 +2,7 @@ import { Auth } from 'aws-amplify';
 import { ApiError, parseApiError } from './errorHandler';
 
 // Use the API URL from environment variables
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.taskmonk.app';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 
 /**
  * Get authentication headers for API requests
@@ -16,6 +16,7 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
       'Content-Type': 'application/json',
     };
   } catch (error) {
+    console.warn('Failed to get auth token:', error);
     return {
       'Content-Type': 'application/json',
     };
@@ -28,7 +29,14 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   try {
     const headers = await getAuthHeaders();
-    const response = await fetch(`${API_URL}${endpoint}`, {
+    
+    // Determine if we should use relative or absolute URL
+    const isAbsoluteUrl = endpoint.startsWith('http');
+    const url = isAbsoluteUrl ? endpoint : `${API_URL}${endpoint}`;
+    
+    console.log(`Making request to: ${url}`);
+    
+    const response = await fetch(url, {
       ...options,
       headers: {
         ...headers,
@@ -42,12 +50,18 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
 
     return response.json();
   } catch (error) {
+    console.error('API request failed:', error);
+    
     if (error instanceof ApiError) {
       throw error;
     }
     
     if (error instanceof Error) {
-      throw new ApiError(error.message);
+      throw new ApiError(
+        error.message === 'Failed to fetch' 
+          ? 'Network error: Unable to connect to the server. Please check your internet connection and try again.'
+          : error.message
+      );
     }
     
     throw new ApiError('An unexpected error occurred');
@@ -71,6 +85,7 @@ export const api = {
     request<T>(endpoint, {
       method: 'POST',
       body: JSON.stringify(data),
+      credentials: 'include', // Include credentials for cross-origin requests
     }),
   
   /**
@@ -80,11 +95,15 @@ export const api = {
     request<T>(endpoint, {
       method: 'PUT',
       body: JSON.stringify(data),
+      credentials: 'include', // Include credentials for cross-origin requests
     }),
   
   /**
    * Make a DELETE request to the API
    */
   delete: <T>(endpoint: string) => 
-    request<T>(endpoint, { method: 'DELETE' }),
+    request<T>(endpoint, { 
+      method: 'DELETE',
+      credentials: 'include', // Include credentials for cross-origin requests
+    }),
 };
