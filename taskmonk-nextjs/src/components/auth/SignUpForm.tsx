@@ -7,6 +7,8 @@ export default function SignUpForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -23,10 +25,15 @@ export default function SignUpForm() {
       return;
     }
 
+    if (!firstName || !lastName) {
+      setError('First name and last name are required');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      await signUp(email, password);
+      await signUp(email, password, firstName, lastName);
       setShowConfirmation(true);
     } catch (err: any) {
       setError(err.message || 'Failed to sign up');
@@ -72,6 +79,42 @@ export default function SignUpForm() {
 
           {!showConfirmation ? (
             <form className="space-y-6" onSubmit={handleSubmit}>
+              <div>
+                <label htmlFor="firstName" className="form-label">
+                  First Name
+                </label>
+                <div className="mt-1">
+                  <input
+                    id="firstName"
+                    name="firstName"
+                    type="text"
+                    autoComplete="given-name"
+                    required
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    className="form-input"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="lastName" className="form-label">
+                  Last Name
+                </label>
+                <div className="mt-1">
+                  <input
+                    id="lastName"
+                    name="lastName"
+                    type="text"
+                    autoComplete="family-name"
+                    required
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    className="form-input"
+                  />
+                </div>
+              </div>
+
               <div>
                 <label htmlFor="email" className="form-label">
                   Email address

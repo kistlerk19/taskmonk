@@ -16,7 +16,7 @@ interface AuthContextType {
   loading: boolean;
   signIn: (email: string, password: string) => Promise<any>;
   signOut: () => Promise<any>;
-  signUp: (email: string, password: string) => Promise<any>;
+  signUp: (email: string, password: string, firstName?: string, lastName?: string) => Promise<any>;
   confirmSignUp: (email: string, code: string) => Promise<any>;
   forgotPassword: (email: string) => Promise<any>;
   resetPassword: (email: string, code: string, newPassword: string) => Promise<any>;
@@ -53,12 +53,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  async function signUp(email: string, password: string) {
+  async function signUp(email: string, password: string, firstName?: string, lastName?: string) {
     try {
       return await Auth.signUp({
         username: email,
         password,
-        attributes: { email },
+        attributes: { 
+          email,
+          'name.givenName': firstName || email.split('@')[0], // Default to username part of email if not provided
+          'name.familyName': lastName || '' // Default to empty string if not provided
+        },
       });
     } catch (error) {
       throw error;
