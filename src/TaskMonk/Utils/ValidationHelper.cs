@@ -33,7 +33,7 @@ namespace TaskMonk.Utils
         
         public static bool IsValidTaskDescription(string description)
         {
-            return description?.Length <= 1000 ?? true;
+            return description == null || description.Length <= 1000;
         }
         
         public static bool IsValidTeamName(string name)
@@ -43,7 +43,7 @@ namespace TaskMonk.Utils
         
         public static bool IsValidTeamDescription(string description)
         {
-            return description?.Length <= 500 ?? true;
+            return description == null || description.Length <= 500;
         }
         
         public static bool IsValidCommentContent(string content)

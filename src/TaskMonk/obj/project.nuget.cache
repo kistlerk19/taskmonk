@@ -1,10 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "B7oN9iL8y38=",
+  "dgSpecHash": "yoqsGF9tBbY=",
   "success": true,
   "projectFilePath": "/Users/verlock/workflows/taskmonk/src/TaskMonk/TaskMonk.csproj",
   "expectedPackageFiles": [
     "/Users/verlock/.nuget/packages/amazon.lambda.apigatewayevents/2.7.0/amazon.lambda.apigatewayevents.2.7.0.nupkg.sha512",
+    "/Users/verlock/.nuget/packages/amazon.lambda.cloudwatchevents/4.4.0/amazon.lambda.cloudwatchevents.4.4.0.nupkg.sha512",
     "/Users/verlock/.nuget/packages/amazon.lambda.core/2.2.0/amazon.lambda.core.2.2.0.nupkg.sha512",
     "/Users/verlock/.nuget/packages/amazon.lambda.dynamodbevents/2.3.0/amazon.lambda.dynamodbevents.2.3.0.nupkg.sha512",
     "/Users/verlock/.nuget/packages/amazon.lambda.serialization.systemtextjson/2.4.0/amazon.lambda.serialization.systemtextjson.2.4.0.nupkg.sha512",

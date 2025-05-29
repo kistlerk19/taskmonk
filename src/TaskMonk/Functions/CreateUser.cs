@@ -5,9 +5,6 @@ using TaskMonk.Models;
 using TaskMonk.Services;
 using TaskMonk.Utils;
 
-// Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
-[assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
-
 namespace TaskMonk.Functions
 {
     public class CreateUser
@@ -24,7 +21,7 @@ namespace TaskMonk.Functions
             _dynamoDbService = dynamoDbService;
         }
         
-        public async Task<APIGatewayProxyResponse> FunctionHandler(APIGatewayProxyRequest request, ILambdaContext context)
+        public async System.Threading.Tasks.Task<APIGatewayProxyResponse> FunctionHandler(APIGatewayProxyRequest request, ILambdaContext context)
         {
             try
             {

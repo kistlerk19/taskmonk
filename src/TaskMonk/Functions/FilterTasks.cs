@@ -8,7 +8,6 @@ using Amazon.DynamoDBv2.Model;
 using System.Text.Json.Serialization;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
-[assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
 
 namespace TaskMonk.Functions
 {
@@ -32,7 +31,7 @@ namespace TaskMonk.Functions
             public string? TeamId { get; set; }
             
             [JsonPropertyName("status")]
-            public TaskStatus? Status { get; set; }
+            public Models.TaskStatus? Status { get; set; }
             
             [JsonPropertyName("priority")]
             public TaskPriority? Priority { get; set; }
@@ -53,7 +52,7 @@ namespace TaskMonk.Functions
             public string? SearchTerm { get; set; }
         }
         
-        public async Task<APIGatewayProxyResponse> FunctionHandler(APIGatewayProxyRequest request, ILambdaContext context)
+        public async System.Threading.Tasks.Task<APIGatewayProxyResponse> FunctionHandler(APIGatewayProxyRequest request, ILambdaContext context)
         {
             try
             {

@@ -7,9 +7,6 @@ using TaskMonk.Utils;
 using Amazon.EventBridge;
 using Amazon.EventBridge.Model;
 
-// Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
-[assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
-
 namespace TaskMonk.Functions
 {
     public class CreateTask
@@ -32,7 +29,7 @@ namespace TaskMonk.Functions
             _eventBridgeClient = eventBridgeClient;
         }
         
-        public async Task<APIGatewayProxyResponse> FunctionHandler(APIGatewayProxyRequest request, ILambdaContext context)
+        public async System.Threading.Tasks.Task<APIGatewayProxyResponse> FunctionHandler(APIGatewayProxyRequest request, ILambdaContext context)
         {
             try
             {
@@ -149,7 +146,7 @@ namespace TaskMonk.Functions
             }
         }
         
-        private async Task PublishTaskEvent(string eventType, Models.Task task)
+        private async System.Threading.Tasks.Task PublishTaskEvent(string eventType, Models.Task task)
         {
             try
             {

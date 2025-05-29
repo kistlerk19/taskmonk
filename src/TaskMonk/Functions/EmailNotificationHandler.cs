@@ -1,12 +1,8 @@
 using Amazon.Lambda.Core;
-using Amazon.Lambda.EventBridgeEvents;
 using System.Text.Json;
 using TaskMonk.Models;
 using TaskMonk.Services;
 using TaskMonk.Utils;
-
-// Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
-[assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
 
 namespace TaskMonk.Functions
 {
@@ -27,24 +23,30 @@ namespace TaskMonk.Functions
             _emailService = emailService;
         }
         
-        public async Task FunctionHandler(EventBridgeEvent<JsonElement> evnt, ILambdaContext context)
+        // Use Dictionary<string, object> instead of EventBridgeEvent
+        public async System.Threading.Tasks.Task FunctionHandler(Dictionary<string, object> eventData, ILambdaContext context)
         {
             try
             {
-                context.Logger.LogInformation($"Processing event: {evnt.DetailType}");
+                context.Logger.LogInformation("Processing event");
                 
-                switch (evnt.DetailType)
+                // Extract event details
+                string detailType = eventData["detail-type"]?.ToString();
+                var detailJson = System.Text.Json.JsonSerializer.Serialize(eventData["detail"]);
+                var detail = JsonDocument.Parse(detailJson).RootElement;
+                
+                switch (detailType)
                 {
                     case var type when type == Constants.TaskStatusChangedEvent:
-                        await HandleTaskStatusChangedEvent(evnt.Detail, context);
+                        await HandleTaskStatusChangedEvent(detail, context);
                         break;
                         
                     case var type when type == Constants.TaskDeadlineApproachingEvent:
-                        await HandleTaskDeadlineApproachingEvent(evnt.Detail, context);
+                        await HandleTaskDeadlineApproachingEvent(detail, context);
                         break;
                         
                     default:
-                        context.Logger.LogInformation($"No handler for event type: {evnt.DetailType}");
+                        context.Logger.LogInformation($"No handler for event type: {detailType}");
                         break;
                 }
             }
@@ -54,7 +56,7 @@ namespace TaskMonk.Functions
             }
         }
         
-        private async Task HandleTaskStatusChangedEvent(JsonElement detail, ILambdaContext context)
+        private async System.Threading.Tasks.Task HandleTaskStatusChangedEvent(JsonElement detail, ILambdaContext context)
         {
             try
             {
@@ -112,7 +114,7 @@ namespace TaskMonk.Functions
                 await _emailService.SendEmailAsync(assignee.Email, subject, htmlBody, textBody);
                 
                 // If task is marked as done, notify the creator as well
-                if (newStatus == TaskStatus.Done.ToString() && task.CreatedBy != task.AssignedTo)
+                if (newStatus == Models.TaskStatus.Done.ToString() && task.CreatedBy != task.AssignedTo)
                 {
                     await _emailService.SendEmailAsync(creator.Email, subject, htmlBody, textBody);
                 }
@@ -123,7 +125,7 @@ namespace TaskMonk.Functions
             }
         }
         
-        private async Task HandleTaskDeadlineApproachingEvent(JsonElement detail, ILambdaContext context)
+        private async System.Threading.Tasks.Task HandleTaskDeadlineApproachingEvent(JsonElement detail, ILambdaContext context)
         {
             try
             {

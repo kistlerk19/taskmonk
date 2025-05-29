@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TaskMonk.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+db4e6e5d9d29b332ad552c65001984fc8e12d502")]
 [assembly: System.Reflection.AssemblyProductAttribute("TaskMonk.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TaskMonk.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

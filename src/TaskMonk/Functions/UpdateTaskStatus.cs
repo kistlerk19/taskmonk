@@ -9,7 +9,6 @@ using Amazon.EventBridge.Model;
 using Amazon.DynamoDBv2.Model;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
-[assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
 
 namespace TaskMonk.Functions
 {
@@ -33,10 +32,10 @@ namespace TaskMonk.Functions
         public class UpdateTaskStatusRequest
         {
             public string TaskId { get; set; } = string.Empty;
-            public TaskStatus Status { get; set; }
+            public Models.TaskStatus Status { get; set; }
         }
         
-        public async Task<APIGatewayProxyResponse> FunctionHandler(APIGatewayProxyRequest request, ILambdaContext context)
+        public async System.Threading.Tasks.Task<APIGatewayProxyResponse> FunctionHandler(APIGatewayProxyRequest request, ILambdaContext context)
         {
             try
             {
@@ -90,7 +89,7 @@ namespace TaskMonk.Functions
                 }
                 
                 // Update task status
-                TaskStatus oldStatus = task.Status;
+                Models.TaskStatus oldStatus = task.Status;
                 task.Status = updateRequest.Status;
                 task.UpdatedAt = DateTime.UtcNow;
                 
@@ -120,7 +119,7 @@ namespace TaskMonk.Functions
             }
         }
         
-        private async Task PublishTaskStatusChangedEvent(Models.Task task, TaskStatus oldStatus)
+        private async System.Threading.Tasks.Task PublishTaskStatusChangedEvent(Models.Task task, Models.TaskStatus oldStatus)
         {
             try
             {

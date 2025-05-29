@@ -6,9 +6,6 @@ using TaskMonk.Services;
 using TaskMonk.Utils;
 using System.Text.Json.Serialization;
 
-// Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
-[assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
-
 namespace TaskMonk.Functions
 {
     public class GenerateTaskReport
@@ -94,7 +91,7 @@ namespace TaskMonk.Functions
             public double AverageCompletionTime { get; set; } // in days
         }
         
-        public async Task<APIGatewayProxyResponse> FunctionHandler(APIGatewayProxyRequest request, ILambdaContext context)
+        public async System.Threading.Tasks.Task<APIGatewayProxyResponse> FunctionHandler(APIGatewayProxyRequest request, ILambdaContext context)
         {
             try
             {
@@ -213,7 +210,7 @@ namespace TaskMonk.Functions
             var summary = new TaskReportSummary
             {
                 TotalTasks = tasks.Count,
-                CompletedTasks = tasks.Count(t => t.Status == TaskStatus.Done)
+                CompletedTasks = tasks.Count(t => t.Status == Models.TaskStatus.Done)
             };
             
             // Calculate completion rate
@@ -222,7 +219,7 @@ namespace TaskMonk.Functions
                 : 0;
             
             // Calculate average completion time for completed tasks
-            var completedTasks = tasks.Where(t => t.Status == TaskStatus.Done).ToList();
+            var completedTasks = tasks.Where(t => t.Status == Models.TaskStatus.Done).ToList();
             if (completedTasks.Any())
             {
                 double totalDays = 0;
@@ -237,7 +234,7 @@ namespace TaskMonk.Functions
             }
             
             // Count tasks by status
-            foreach (var status in Enum.GetValues(typeof(TaskStatus)))
+            foreach (var status in Enum.GetValues(typeof(Models.TaskStatus)))
             {
                 var statusName = status.ToString();
                 var count = tasks.Count(t => t.Status.ToString() == statusName);
@@ -258,7 +255,7 @@ namespace TaskMonk.Functions
             {
                 var dateKey = group.Key.ToString("yyyy-MM-dd");
                 var created = group.Count();
-                var completed = group.Count(t => t.Status == TaskStatus.Done);
+                var completed = group.Count(t => t.Status == Models.TaskStatus.Done);
                 
                 summary.TasksByDay[dateKey] = new TaskDayStats
                 {
@@ -270,7 +267,7 @@ namespace TaskMonk.Functions
             return summary;
         }
         
-        private async Task<List<UserPerformance>> GeneratePerformanceReport(List<Models.Task> tasks)
+        private async System.Threading.Tasks.Task<List<UserPerformance>> GeneratePerformanceReport(List<Models.Task> tasks)
         {
             var userPerformance = new Dictionary<string, UserPerformance>();
             
@@ -278,28 +275,32 @@ namespace TaskMonk.Functions
             var userIds = tasks
                 .Where(t => !string.IsNullOrEmpty(t.AssignedTo))
                 .Select(t => t.AssignedTo)
+                .Where(id => id != null)
                 .Distinct()
                 .ToList();
             
             // Get user details
             foreach (var userId in userIds)
             {
-                var user = await _dynamoDbService.GetItemAsync<User>(
-                    Constants.UsersTable, 
-                    "userId", 
-                    userId);
-                    
-                if (user != null)
+                if (userId != null)
                 {
-                    userPerformance[userId] = new UserPerformance
+                    var user = await _dynamoDbService.GetItemAsync<User>(
+                        Constants.UsersTable, 
+                        "userId", 
+                        userId);
+                        
+                    if (user != null)
                     {
-                        UserId = userId,
-                        Name = $"{user.FirstName} {user.LastName}",
-                        TasksAssigned = 0,
-                        TasksCompleted = 0,
-                        CompletionRate = 0,
-                        AverageCompletionTime = 0
-                    };
+                        userPerformance[userId] = new UserPerformance
+                        {
+                            UserId = userId,
+                            Name = $"{user.FirstName} {user.LastName}",
+                            TasksAssigned = 0,
+                            TasksCompleted = 0,
+                            CompletionRate = 0,
+                            AverageCompletionTime = 0
+                        };
+                    }
                 }
             }
             
@@ -308,11 +309,11 @@ namespace TaskMonk.Functions
             {
                 var userId = task.AssignedTo;
                 
-                if (userPerformance.ContainsKey(userId))
+                if (userId != null && userPerformance.ContainsKey(userId))
                 {
                     userPerformance[userId].TasksAssigned++;
                     
-                    if (task.Status == TaskStatus.Done)
+                    if (task.Status == Models.TaskStatus.Done)
                     {
                         userPerformance[userId].TasksCompleted++;
                         
@@ -342,7 +343,7 @@ namespace TaskMonk.Functions
             return userPerformance.Values.ToList();
         }
         
-        private string GetUserIdFromClaims(APIGatewayProxyRequest request)
+        private string? GetUserIdFromClaims(APIGatewayProxyRequest request)
         {
             try
             {

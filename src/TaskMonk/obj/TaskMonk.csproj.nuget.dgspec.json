@@ -64,6 +64,10 @@
               "target": "Package",
               "version": "[2.7.0, )"
             },
+            "Amazon.Lambda.CloudWatchEvents": {
+              "target": "Package",
+              "version": "[4.4.0, )"
+            },
             "Amazon.Lambda.Core": {
               "target": "Package",
               "version": "[2.2.0, )"

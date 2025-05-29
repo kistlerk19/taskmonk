@@ -1,5 +1,4 @@
 using Amazon.Lambda.Core;
-using Amazon.Lambda.CloudWatchEvents;
 using System.Text.Json;
 using TaskMonk.Models;
 using TaskMonk.Services;
@@ -8,9 +7,6 @@ using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
 using Amazon.EventBridge;
 using Amazon.EventBridge.Model;
-
-// Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
-[assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
 
 namespace TaskMonk.Functions
 {
@@ -31,7 +27,8 @@ namespace TaskMonk.Functions
             _eventBridgeClient = eventBridgeClient;
         }
         
-        public async Task FunctionHandler(CloudWatchEvent<object> evnt, ILambdaContext context)
+        // Use Dictionary<string, object> instead of CloudWatchEvent
+        public async System.Threading.Tasks.Task FunctionHandler(Dictionary<string, object> eventData, ILambdaContext context)
         {
             try
             {
@@ -54,7 +51,7 @@ namespace TaskMonk.Functions
                     {
                         { ":now", new AttributeValue { S = now.ToString("o") } },
                         { ":tomorrow", new AttributeValue { S = tomorrow.ToString("o") } },
-                        { ":done", new AttributeValue { S = TaskStatus.Done.ToString() } }
+                        { ":done", new AttributeValue { S = Models.TaskStatus.Done.ToString() } }
                     }
                 };
                 
@@ -106,7 +103,7 @@ namespace TaskMonk.Functions
                 
                 if (item.TryGetValue("status", out var status))
                 {
-                    if (Enum.TryParse<TaskStatus>(status.S, out var taskStatus))
+                    if (Enum.TryParse<Models.TaskStatus>(status.S, out var taskStatus))
                     {
                         task.Status = taskStatus;
                     }
@@ -143,7 +140,7 @@ namespace TaskMonk.Functions
             }
         }
         
-        private async Task PublishDeadlineApproachingEvent(Models.Task task)
+        private async System.Threading.Tasks.Task PublishDeadlineApproachingEvent(Models.Task task)
         {
             try
             {
